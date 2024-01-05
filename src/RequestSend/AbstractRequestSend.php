@@ -36,6 +36,20 @@ abstract class AbstractRequestSend extends BaseObject implements InterfaceReques
      */
     public $isDebug = false;
 
+    public function init()
+    {
+        parent::init();
+        if (empty($this->domain)) {
+            $this->domain = AccountConfig::getParamConfigValue('domain');
+        }
+        if (empty($this->appID)) {
+            $this->appID = AccountConfig::getParamConfigValue('appID');
+        }
+        if (empty($this->appSecret)) {
+            $this->appSecret = AccountConfig::getParamConfigValue('appSecret');
+        }
+    }
+
     /**
      * 发送请求
      * @param ApiRequestBase $request
