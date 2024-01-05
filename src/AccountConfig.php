@@ -7,6 +7,8 @@
 namespace Tesoon\Account;
 
 use InvalidArgumentException;
+use Tesoon\Account\Logs\DefaultLog;
+use Tesoon\Account\Token\JwtToken;
 
 /**
  * 组件配置
@@ -17,15 +19,21 @@ class AccountConfig
      * @var InterfaceParamConfig 配置数据获取
      */
     private static $paramConfig;
+
     /**
      * @var InterfaceToken 组件内部处理jwt数据的对象
      */
     private static $token;
 
     /**
-     * @var InterfaceRequestSend 组件内容发送接口请求的对象
+     * @var InterfaceRequestSend 组件内部发送接口请求的对象
      */
     private static $sendRequest;
+
+    /**
+     * @var InterfaceLog 组件内部记录日志的对象
+     */
+    private static $log;
 
     /**
      * 获取配置值
@@ -57,7 +65,7 @@ class AccountConfig
     public static function getToken():InterfaceToken
     {
         if (empty(self::$token)) {
-            throw new InvalidArgumentException('请先配置【token】值');
+            self::$token = new JwtToken();
         }
         return self::$token;
     }
@@ -91,7 +99,28 @@ class AccountConfig
      */
     public static function setSendRequest(InterfaceRequestSend $sendRequest):InterfaceRequestSend
     {
-        //todo
         return self::$sendRequest = $sendRequest;
+    }
+
+    /**
+     * 获取组件内的log对象
+     * @return InterfaceLog
+     */
+    public static function getLog():InterfaceLog
+    {
+        if (empty(self::$log)) {
+            self::$log = new DefaultLog();
+        }
+        return self::$log;
+    }
+
+    /**
+     * 设置组件内的log对象
+     * @param InterfaceLog $log
+     * @return InterfaceLog
+     */
+    public static function setLog(InterfaceLog $log):InterfaceLog
+    {
+        return self::$log = $log;
     }
 }

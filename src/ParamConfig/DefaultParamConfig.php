@@ -6,12 +6,13 @@
 
 namespace Tesoon\Account\ParamConfig;
 
+use Tesoon\Account\BaseObject;
 use Tesoon\Account\InterfaceParamConfig;
 
 /**
  * 不使用框架的参数获取
  */
-class DefaultParamConfig implements InterfaceParamConfig
+class DefaultParamConfig extends BaseObject implements InterfaceParamConfig
 {
     /**
      * @var array 配置数据

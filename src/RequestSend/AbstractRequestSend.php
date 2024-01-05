@@ -6,6 +6,7 @@
 
 namespace Tesoon\Account\RequestSend;
 
+use Tesoon\Account\AccountConfig;
 use Tesoon\Account\BaseObject;
 use Tesoon\Account\Exceptions\ExceptionAccount;
 use Tesoon\Account\InterfaceRequestSend;
@@ -35,6 +36,20 @@ abstract class AbstractRequestSend extends BaseObject implements InterfaceReques
      */
     public $isDebug = false;
 
+    public function init()
+    {
+        parent::init();
+        if (empty($this->domain)) {
+            $this->domain = AccountConfig::getParamConfigValue('domain');
+        }
+        if (empty($this->appID)) {
+            $this->appID = AccountConfig::getParamConfigValue('appID');
+        }
+        if (empty($this->appSecret)) {
+            $this->appSecret = AccountConfig::getParamConfigValue('appSecret');
+        }
+    }
+
     /**
      * 发送请求
      * @param ApiRequestBase $request
@@ -55,11 +70,12 @@ abstract class AbstractRequestSend extends BaseObject implements InterfaceReques
         $curl = new Curl();
         $curl->setHeaders($request->getRequestHeaders())
             ->setOptions($requestOptions);
-        if ($beforeSend = $this->beforeSend($request, $curl) !== true) {
+        if (($beforeSend = $this->beforeSend($request, $curl)) !== true) {
             return $beforeSend;
         }
         $this->encryptRequest($request, $curl);
 
+        AccountConfig::getLog()->info($request->requestMethod.':'.$url);
         switch ($request->requestMethod) {
             case ApiRequestBase::REQUEST_METHOD_GET:
                 $curl->setGetParams($request->requestParams)->get($url, $raw);
@@ -90,6 +106,7 @@ abstract class AbstractRequestSend extends BaseObject implements InterfaceReques
             case '400'://常规错误
             case '401'://token无效
             default:
+                AccountConfig::getLog()->error($curl);
                 $curlResponse = $curl->response;
                 if (is_array($curlResponse) && isset($curlResponse['message'])) {
                     $curlResponse = $curlResponse['message'];
