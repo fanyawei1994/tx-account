@@ -23,15 +23,15 @@ use Tesoon\Account\ParamConfig\DefaultParamConfig;
 //此处的DefaultParamConfig也可自行根据业务逻辑实现
 AccountConfig::setParamConfig(new DefaultParamConfig([
     'configs' => [
-        'domain' => 'http://127.0.0.1:8087',//用户服务器域名
-        'appID' => 'tx9bf31c7ff0',//本系统应用的appID
-        'appSecret' => 'JqpbyP0nQVxgMEUQfzDU',//本系统应用的appsecret
-        'jwtToken' => [
-            'key' => '*****',
-            'validate' => true,
-            'verify' => true,
-            'jtiInterval' => 70,
-        ],
+        'domain' => 'https://*****',//用户服务器域名
+            'appID' => '*****',//本系统应用的appID
+            'appSecret' => '*****',//本系统应用的appsecret
+            'jwtToken' => [
+                'key' => '*****',//jwt加密密钥
+                'validate' => true,//验证token有效截至时间，如不验证则设置为false
+                'verify' => true,//验证token的合法性，如不验证设置为false
+                'jtiInterval' => 70,//向token签发服务器验证jti有效性的时间间隔
+            ],
     ]
 ]));
 //ExampleRequestSend为自行实现的InterfaceRequestSend
