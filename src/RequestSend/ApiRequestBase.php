@@ -4,13 +4,15 @@
  * Date: 2023/12/29 16:56
  */
 
-namespace Tesoon\Account\RequestSend\Request;
+namespace Tesoon\Account\RequestSend;
+
+use Tesoon\Account\BaseObject;
 
 /**
  * Class ApiRequestBase
  * @package fanyawei\txAccount\apiRequest
  */
-abstract class ApiRequestBase
+abstract class ApiRequestBase extends BaseObject
 {
     /**
      * 请求方式

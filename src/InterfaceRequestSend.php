@@ -6,7 +6,7 @@
 
 namespace Tesoon\Account;
 
-use Tesoon\Account\RequestSend\Request\ApiRequestBase;
+use Tesoon\Account\RequestSend\ApiRequestBase;
 
 /**
  * 发送请求处理逻辑类

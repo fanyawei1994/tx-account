@@ -6,14 +6,14 @@
 
 namespace Tesoon\Account\RequestSend;
 
-use Exception;
+use Tesoon\Account\BaseObject;
+use Tesoon\Account\Exceptions\ExceptionAccount;
 use Tesoon\Account\InterfaceRequestSend;
-use Tesoon\Account\RequestSend\Request\ApiRequestBase;
 
 /**
  * 发送请求类
  */
-abstract class AbstractRequestSend implements InterfaceRequestSend
+abstract class AbstractRequestSend extends BaseObject implements InterfaceRequestSend
 {
     /**
      * @var string appID
@@ -53,8 +53,7 @@ abstract class AbstractRequestSend implements InterfaceRequestSend
             $requestOptions[CURLOPT_SSL_VERIFYHOST] = 0;
         }
         $curl = new Curl();
-        $curl->setGetParams($request->requestParams)
-            ->setHeaders($request->getRequestHeaders())
+        $curl->setHeaders($request->getRequestHeaders())
             ->setOptions($requestOptions);
         if ($beforeSend = $this->beforeSend($request, $curl) !== true) {
             return $beforeSend;
@@ -63,13 +62,13 @@ abstract class AbstractRequestSend implements InterfaceRequestSend
 
         switch ($request->requestMethod) {
             case ApiRequestBase::REQUEST_METHOD_GET:
-                $curl->get($url, $raw);
+                $curl->setGetParams($request->requestParams)->get($url, $raw);
                 break;
             case ApiRequestBase::REQUEST_METHOD_POST:
-                $curl->post($url, $raw);
+                $curl->setPostParams($request->requestParams)->post($url, $raw);
                 break;
             default:
-                throw new \Error('暂不支持的请求方法');
+                throw new ExceptionAccount('暂不支持的请求方法');
         }
         $this->afterSend($request, $curl);
         return $this->formatCurl($curl);
@@ -82,7 +81,7 @@ abstract class AbstractRequestSend implements InterfaceRequestSend
     public function formatCurl(Curl $curl)
     {
         if (!empty($curl->errorText)) {
-            throw new Exception($curl->errorText, $curl->errorCode);
+            throw new ExceptionAccount($curl->errorText, $curl->errorCode);
         }
 
         switch ($curl->responseCode) {
@@ -95,7 +94,7 @@ abstract class AbstractRequestSend implements InterfaceRequestSend
                 if (is_array($curlResponse) && isset($curlResponse['message'])) {
                     $curlResponse = $curlResponse['message'];
                 }
-                throw new Exception($curlResponse, $curl->responseCode);
+                throw new ExceptionAccount($curlResponse, $curl->responseCode);
         }
     }
 

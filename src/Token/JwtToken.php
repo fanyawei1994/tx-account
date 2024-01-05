@@ -9,15 +9,16 @@ use Exception;
 use Lcobucci\JWT\Claim\Basic;
 use Lcobucci\JWT\Token;
 use Tesoon\Account\AccountConfig;
+use Tesoon\Account\ApiHelper;
+use Tesoon\Account\BaseObject;
 use Tesoon\Account\InterfaceToken;
-use Tesoon\Account\RequestSend\Request\IndexValidateJti;
 use Tesoon\Account\Token\Jwt\Jwt;
 
 /**
  * Class DefaultJwt
  * @package Tesoon\Account\JWT
  */
-class JwtToken implements InterfaceToken
+class JwtToken extends BaseObject implements InterfaceToken
 {
 
     /**
@@ -95,11 +96,10 @@ class JwtToken implements InterfaceToken
     {
         //验证token有效截至时间，如不验证则设置为false
         $validate = AccountConfig::getParamConfigValue('jwtToken.validate', true);
-        //验证token的合法性，如不严重设置为false
+        //验证token的合法性，如不验证设置为false
         $verify = AccountConfig::getParamConfigValue('jwtToken.verify', true);
         //向token签发服务器验证jti有效性的时间间隔
         $jtiInterval = AccountConfig::getParamConfigValue('jwtToken.jtiInterval', 60);
-
 
         try {
             if (empty($token = $this->getJwt()->loadToken($token, $validate, $verify))) {
@@ -108,9 +108,8 @@ class JwtToken implements InterfaceToken
 
             //如果距上次验证数据有效性超过一分钟，就去用户服务器验证数据有效性
             if ($token->getClaim('lastValidateTime', 0) < time() - $jtiInterval) {
-                $validateJtiRequest = new IndexValidateJti();
-                $validateJtiRequest->setJti($token->getClaim('jti'));
-                $buffer = AccountConfig::getSendRequest()->send($validateJtiRequest);
+                $buffer = ApiHelper::indexValidateJti($token->getClaim('jti'));
+
                 if (empty($buffer['status'])) {
                     return false;
                 }

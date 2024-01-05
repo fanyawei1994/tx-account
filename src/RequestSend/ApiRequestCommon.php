@@ -4,7 +4,7 @@
  * Date: 2024/1/4 9:17
  */
 
-namespace Tesoon\Account\RequestSend\Request;
+namespace Tesoon\Account\RequestSend;
 
 /**
  * 一个通用的Api请求类，当新增接口但组件尚未更新没有指定接口请求类时使用
