@@ -85,5 +85,3 @@ $token = AccountConfig::getToken()->validateToken($tokenStr);
 $jti = $token->getClaim('jti');
 $identity = $token->getClaim('identity');
 ```
-
-
