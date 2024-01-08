@@ -3,12 +3,21 @@
 
 [[说明文档](https://showdoc.tesoon.com/web/#/23?page_id=4087)]
 
+版本规划说明：
+- v1.0.* 适用php7.2及以上版本
+- v1.1.* 最低兼容php7.4
+
 ## 快速开始
 
 ### 1. 安装
 - 通过composer安装
 ```composer
+//如果项目环境为php7.4及以上版本
+composer require tx/account ~1.1
+
+//如果项目环境为php7.2到php7.4之间版本
 composer require tx/account ~1.0
+
 ```
 
 ### 2. 组件配置

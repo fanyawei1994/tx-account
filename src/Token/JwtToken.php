@@ -5,7 +5,9 @@
  */
 namespace Tesoon\Account\Token;
 
+use DateTimeImmutable;
 use Exception;
+use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Claim\Basic;
 use Lcobucci\JWT\Token;
 use Tesoon\Account\AccountConfig;
@@ -67,10 +69,10 @@ class JwtToken extends BaseObject implements InterfaceToken
 
         $signer = $jwt->getSigner($this->jwtAlg);
         $token = $jwt->getBuilder()
-            ->identifiedBy($params['jti'], true)//jwt的唯一身份标识
-            ->issuedAt($params['iat']) //jwt的签发时间
-            ->canOnlyBeUsedAfter($params['nbf']) // 定义在什么时间之前，该jwt都是不可用的.
-            ->expiresAt($params['exp']) // jwt的过期时间，这个过期时间必须要大于签发时间
+            ->identifiedBy($params['jti'])//jwt的唯一身份标识
+            ->issuedAt(new DateTimeImmutable('@' . $params['iat'])) //jwt的签发时间
+            ->canOnlyBeUsedAfter(new DateTimeImmutable('@' . $params['nbf'])) // 定义在什么时间之前，该jwt都是不可用的.
+            ->expiresAt(new DateTimeImmutable('@' . $params['exp'])) // jwt的过期时间，这个过期时间必须要大于签发时间
             ->withClaim('lastValidateTime', time());//记录上次验证时间
 
         if (isset($params['iss'])) {
@@ -146,12 +148,46 @@ class JwtToken extends BaseObject implements InterfaceToken
             if ($value instanceof Basic) {
                 $value = $value->getValue();
             }
-            $newToken->withClaim($key, $value);
+            self::tokenWithClaim($newToken, $key, $value);
         }
         foreach ($claims as $key => $value) {
-            $newToken->withClaim($key, $value);
+            self::tokenWithClaim($newToken, $key, $value);
         }
 
         return $newToken->getToken($jwt->getSigner($token->getHeader('alg')), $jwt->getKey());
+    }
+
+    /**
+     * 设置token配置属性值
+     * @param Builder $builder
+     * @param string $key
+     * @param mixed $value
+     */
+    public static function tokenWithClaim(Builder $builder, string $key, $value):void
+    {
+        switch ($key) {
+            case Token\RegisteredClaims::AUDIENCE:
+                $builder->setAudience($value);
+                return;
+            case Token\RegisteredClaims::EXPIRATION_TIME:
+                $builder->expiresAt(new DateTimeImmutable('@' . $value));
+                return;
+            case Token\RegisteredClaims::ID:
+                $builder->identifiedBy($value);
+                return;
+            case Token\RegisteredClaims::ISSUED_AT:
+                $builder->issuedAt(new DateTimeImmutable('@' . $value));
+                return;
+            case Token\RegisteredClaims::ISSUER:
+                $builder->issuedBy($value);
+                return;
+            case Token\RegisteredClaims::NOT_BEFORE:
+                $builder->canOnlyBeUsedAfter(new DateTimeImmutable('@' . $value));
+                return;
+            case Token\RegisteredClaims::SUBJECT:
+                $builder->setSubject($value);
+                return;
+        }
+        $builder->withClaim($key, $value);
     }
 }
