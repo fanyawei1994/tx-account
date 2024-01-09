@@ -12,10 +12,7 @@
 ### 1. 安装
 - 通过composer安装
 ```composer
-//如果项目环境为php7.4及以上版本
-composer require tx/account ~1.1
-
-//如果项目环境为php7.2到php7.4之间版本
+//如果项目环境为php7.2及以上版本
 composer require tx/account ~1.0
 
 ```
